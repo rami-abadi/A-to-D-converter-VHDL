@@ -1,0 +1,30 @@
+ENTITY comparator IS
+ port(TERMINAL inn1, inp1, irefn1 ,irefp1:
+ electrical;
+ SIGNAL bitc : out std_logic;
+ SIGNAL CLK : in bit);
+END ENTITY comparator;
+ARCHITECTURE behavioral OF comparator IS
+ QUANTITY vinn ACROSS xvinn THROUGH inn1 TO
+ electrical_ref;
+ QUANTITY vinp ACROSS inp1 TO electrical_ref;
+ QUANTITY vrefn ACROSS irefn11 TO
+ electrical_ref;
+ QUANTITY vrefp ACROSS irefp1 TO
+ electrical_ref;
+ QUANTITY vin ACROSS inp1 TO inn1;
+ QUANTITY vref ACROSS irefp1 TO irefn1;
+BEGIN
+ vin == vinp-vinn;
+ vref == (vrefp-vrefn);
+ PROCESS (CLK)
+ BEGIN
+ IF (CLK = '0') THEN
+ bitc <= '0';
+ ELSIF (CLK ='1') AND (vin <= vref/4.0) THEN
+ bitc <= '0';
+ ELSIF (CLK ='1') AND (vref/4.0 <= vin) THEN
+ bitc <= '1';
+ END IF;
+ END PROCESS;
+END behavioral;
