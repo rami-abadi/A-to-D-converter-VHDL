@@ -1,0 +1,32 @@
+ENTITY sample_mul is
+ PORT (TERMINAL gain,inn1, inp1, ioutp1,
+ ioutn1, iagnd: electrical;
+ clock_signal:in bit);
+END ENTITY sample_mul;
+ARCHITECTURE ideal OF sample_mul IS
+ QUANTITY vinn ACROSS inn1 TO electrical_ref;
+ QUANTITY vinp ACROSS inp1 TO electrical_ref;
+ QUANTITY agnd ACROSS iagnd TO
+ electrical_ref;
+ QUANTITY voutp ACROSS xoutp THROUGH ioutp1
+ TO electrical_ref;
+ QUANTITY voutn ACROSS xoutn THROUGH ioutn1
+ TO electrical_ref;
+ QUANTITY cc ACROSS gain TO electrical_ref;
+ SIGNAL samplep, samplen:real:=0.0;
+BEGIN
+ PROCESS
+ BEGIN
+ WAIT UNTIL clock_signal'EVENT
+ AND clock_signal='1';
+ samplep <= vinp;
+ samplen <= vinn;
+ END PROCESS;
+ IF (clock_signal = '0') USE
+ voutp == agnd;
+ voutn == agnd;
+ ELSE
+ voutp == (cc+1.0)*samplep-cc*vinn; --eq(1)
+ voutn == (cc+1.0)*samplen-cc*vinp; --eq(1)
+ END USE;
+END architecture ideal; 
